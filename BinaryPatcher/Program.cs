@@ -14,10 +14,13 @@ namespace BinaryPatcher
         [STAThread]
         static void Main()
         {
-
+            ResolveEventHandler ev = new ResolveEventHandler(AssemblyLoader.AssemblyResolve);
+            AppDomain.CurrentDomain.AssemblyResolve += ev;
 
             Controller controller = new Controller();
             controller.Run(System.Environment.GetCommandLineArgs());
+
+            AppDomain.CurrentDomain.AssemblyResolve -= ev;
         }
 
         private class Controller : WindowsFormsApplicationBase

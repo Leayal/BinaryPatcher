@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
@@ -19,6 +18,18 @@ namespace BinaryPatcher
         public MyMainMenu()
         {
             InitializeComponent();
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            this.synccontext = SynchronizationContext.Current;
+            this.Icon = Properties.Resources.icon;
+            this.worker = new BackgroundWorker();
+            this.worker.DoWork += this.Worker_DoWork;
+            this.worker.RunWorkerCompleted += this.Worker_RunWorkerCompleted;
+            this.worker.WorkerSupportsCancellation = true;
+            this.worker.WorkerReportsProgress = false;
         }
 
         protected override void OnShown(EventArgs e)
@@ -93,11 +104,36 @@ namespace BinaryPatcher
                 {
                     IEnumerable<BinaryScanResult> walker;
                     byte[] replacingbytes;
+                    string[] strs;
                     switch (model.Type)
                     {
                         case Type.Byte:
-                            byte[] bytes = Leayal.ByteHelper.FromHexString(model.SearchFor);
-                            string[] strs = model.ReplaceWith.Split(Spacing, StringSplitOptions.RemoveEmptyEntries);
+                            bool qualified = false;
+                            for (int i = 0; i < Spacing.Length; i++)
+                                if (model.ReplaceWith.IndexOf(Spacing[i]) > -1)
+                                {
+                                    qualified = true;
+                                    break;
+                                }
+                            if (!qualified)
+                                throw new ArgumentException("The replace with should has space between each byte.");
+
+                            strs = model.ReplaceWith.Split(Spacing, StringSplitOptions.RemoveEmptyEntries);
+                            byte[] bytes = new byte[strs.Length];
+                            for (int i = 0; i < bytes.Length; i++)
+                                bytes[i] = byte.Parse(strs[i]);
+
+                            qualified = false;
+                            for (int i = 0; i < Spacing.Length; i++)
+                                if (model.ReplaceWith.IndexOf(Spacing[i]) > -1)
+                                {
+                                    qualified = true;
+                                    break;
+                                }
+                            if (!qualified)
+                                throw new ArgumentException("The replace with should has space between each byte.");
+
+                            strs = model.ReplaceWith.Split(Spacing, StringSplitOptions.RemoveEmptyEntries);
                             replacingbytes = new byte[strs.Length];
                             for (int i = 0; i < replacingbytes.Length; i++)
                                 replacingbytes[i] = byte.Parse(strs[i]);
@@ -124,17 +160,6 @@ namespace BinaryPatcher
             }
             else
                 throw new ArgumentException();
-        }
-
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
-            this.synccontext = SynchronizationContext.Current;
-            this.worker = new BackgroundWorker();
-            this.worker.DoWork += this.Worker_DoWork;
-            this.worker.RunWorkerCompleted += this.Worker_RunWorkerCompleted;
-            this.worker.WorkerSupportsCancellation = true;
-            this.worker.WorkerReportsProgress = false;
         }
 
         private BinaryScanner Create(string filepath)

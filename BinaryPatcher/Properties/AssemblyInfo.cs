@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("BinaryPatcher")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Binary Patcher")]
+[assembly: AssemblyDescription("Patching binary files.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("BinaryPatcher")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyProduct("Binary Patcher")]
+[assembly: AssemblyCopyright("Copyright ©  2017 Leayal")]
+[assembly: AssemblyTrademark("Dramiel Leayal")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
